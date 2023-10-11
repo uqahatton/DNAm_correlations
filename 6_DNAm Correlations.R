@@ -3,6 +3,10 @@
 ## Correlation between traits
 ###############################
 
+mycolours <- c("#00AFBB", "#E7B800", "#FC4E07", "#0072B2", "#009E73",
+               "#F0E442", "#D55E00", "#CC79A7") 
+
+
 # Bivariate REML
 
 # bmi_RankNorm $3
@@ -135,15 +139,16 @@ plot_ds <- traits_wide %>% filter(!Trait1 %in% c("Waist Circumference", "Weight"
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.character
 plot_ds$Trait2 <- plot_ds$Trait2 %>% as.character
 plot_ds$rG_Variance <- plot_ds$rG_Variance %>% as.character
+plot_ds$rG_SE <- plot_ds$rG_SE %>% as.character
 
-plot_ds <- plot_ds %>% select(Trait1, Trait2, rG_Variance, label)
+plot_ds <- plot_ds %>% select(Trait1, Trait2, rG_Variance, label, rG_SE)
 
-plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA, NA) %>% as.list
 # plot_ds[nrow(plot_ds) + 1,] <- c("Height", "Height",  NA, NA) %>% as.list
 
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.factor
@@ -251,8 +256,6 @@ corr_with_RankNorm$Trait <- recode_factor( corr_with_RankNorm$Trait,
                                            waist = "Waist Circumference",
                                            hips = "Hip Circumference")
 
-corr_with_RankNorm %>% select(Trait, Correlation.with.RankNorm) %>% kable(caption=" Correlation between each trait and rank normalised residuals")
-
 
 pheno_correlations <- read.table("/Users/uqahatt2/Documents/2_project/4_GS/1_Correlations/data/phenotypes/pheno_correlations.txt", header=T) 
 names <- recode_factor(rownames(pheno_correlations) , 
@@ -271,9 +274,6 @@ pheno_correlations <- pheno_correlations[c(1, 3, 2, 4, 5), c(3, 2, 4, 5, 6)]
 
 pheno_correlations_mat <- pheno_correlations %>% as.matrix %>% signif(2)
 pheno_correlations_mat[lower.tri(pheno_correlations_mat)] <- NA
-
-options(knitr.kable.NA = '')
-pheno_correlations_mat %>% kable(caption = "Phenotypic correlation between traits")
 
 
 pheno_correlations_se <- read.table("/Users/uqahatt2/Documents/2_project/4_GS/1_Correlations/data/phenotypes/pheno_correlations_se.txt", header=T)
@@ -296,21 +296,22 @@ plot_ds <- pheno %>% filter(
   !is.na(value) ) %>%
   mutate(Trait1 = fct_reorder(Trait1, desc(Trait1)),
          label = paste0(value %>% signif(digits = 2), " (", se %>% signif(digits=1), ")"))  %>% 
-  select(Trait1, Trait2, value, label)
+  select(Trait1, Trait2, value, label, se)
 
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.character
 plot_ds$Trait2 <- plot_ds$Trait2 %>% as.character
 plot_ds$rG_Variance <- plot_ds$value %>% as.character
+plot_ds$se <- plot_ds$se %>% as.character
 
 
 
-plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Height", "Height",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Height", "Height",  NA, NA, NA, NA) %>% as.list
 
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.factor
 plot_ds$Trait2 <- plot_ds$Trait2 %>% as.factor
@@ -494,17 +495,7 @@ traits_wide <- traits %>%
   spread(key = Var, value = col_value) %>%
   unnest(c(`V(O)/Vp1`, `V(O)/Vp2`, `rG`, `Pval`),  .sep = '_')
 
-# options(knitr.kable.NA = '')
-# traits_wide %>% 
-#   mutate(rG = rG_Variance %>% signif(digits = 2)) %>% 
-#   select(Trait1, Trait2, rG) %>%
-#   spread(key = Trait2, value = rG) %>%
-#   kable(caption="Epigenetic Correlations") 
 
-
-# Heatmap 
-# library(RColorBrewer)
-# library(ggplot2)
 library(forcats)
 
 plot_ds <- traits_wide %>% filter(!Trait1 %in% c("Waist Circumference", "Weight") & !(Trait2 %in% c("Hip Circumference", "Weight", "Waist Circumference")) ) %>%
@@ -514,17 +505,18 @@ plot_ds <- traits_wide %>% filter(!Trait1 %in% c("Waist Circumference", "Weight"
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.character
 plot_ds$Trait2 <- plot_ds$Trait2 %>% as.character
 plot_ds$rG_Variance <- plot_ds$rG_Variance %>% as.character
+plot_ds$SE <- plot_ds$rG_SE %>% as.character
 
 
-plot_ds <- plot_ds %>% select(Trait1, Trait2, rG_Variance, label)
-plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Height", "Height",  NA, NA) %>% as.list
-plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "HDL Cholesterol",  NA, NA) %>% as.list
+plot_ds <- plot_ds %>% select(Trait1, Trait2, rG_Variance, label, SE)
+plot_ds[nrow(plot_ds) + 1,] <- c("BMI", "BMI", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Waist to Hip Ratio", "Waist to Hip Ratio", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Body Fat %", "Body Fat %", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Glucose", "Glucose",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("HDL Cholesterol", "HDL Cholesterol",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "Total Cholesterol", NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Height", "Height",  NA, NA, NA) %>% as.list
+plot_ds[nrow(plot_ds) + 1,] <- c("Total Cholesterol", "HDL Cholesterol",  NA, NA, NA) %>% as.list
 
 
 plot_ds$Trait1 <- plot_ds$Trait1 %>% as.factor
@@ -660,17 +652,19 @@ ggarrange(
   ncol=1, heights= c(1, 1, 1.5))
 
 merge_heatmap <- rbind(
-  r_DNAm_plot %>% select(Trait1, Trait2,  rG_Variance, label) %>% mutate(var="DNAm"),
-  r_G_plot %>% select(Trait1, Trait2,  rG_Variance, label) %>% mutate(var="Genetic"),
-  r_pheno_plot %>% select(Trait1, Trait2,  rG_Variance, label) %>% mutate(var="Phenotypic")) %>%
+  r_DNAm_plot %>% select(Trait1, Trait2,  rG_Variance, label, se=rG_SE) %>% mutate(var="DNAm"),
+  r_G_plot %>% select(Trait1, Trait2,  rG_Variance, label, se=SE) %>% mutate(var="Genetic"),
+  r_pheno_plot %>% select(Trait1, Trait2,  rG_Variance, label, se) %>% mutate(var="Phenotypic")) %>%
   filter(Trait2!="BMI" & Trait1!="Height" & Trait2!="Height" & Trait1!="Total Cholesterol" & Trait1!=Trait2) %>%
-  mutate(rG_Variance = rG_Variance %>% as.numeric %>% round(2))
+  mutate(rG_Variance = rG_Variance %>% as.numeric %>% round(2),
+         se = se %>% as.numeric %>% signif(1))
 
 
 ggplot(merge_heatmap ,
        aes(x = Trait2, y = Trait1, fill = rG_Variance)) +
   geom_raster() +
-  geom_text(aes(label =  rG_Variance), size=3) +
+  geom_text(aes(label =  rG_Variance), size=4) +
+  geom_text(aes(label =  paste0("(",se,")")), size=2.8, vjust=2.5) +
   theme_minimal() +
   theme(panel.grid = element_blank())+ 
   labs(fill = "Correlation", y="", x="") +
@@ -682,6 +676,9 @@ ggplot(merge_heatmap ,
   facet_grid(~var) +
   theme(strip.text.x = element_text(size = 11, colour = "black")) +
   theme(panel.spacing = unit(0.1, "lines"))
+
+
+ggsave(file="/Users/uqahatt2/Documents/2_project/4_GS/1_Correlations/presentations/correlations.png", width = 13, height = 5, dpi = 300, units = "in", device='png')
 
 
 
